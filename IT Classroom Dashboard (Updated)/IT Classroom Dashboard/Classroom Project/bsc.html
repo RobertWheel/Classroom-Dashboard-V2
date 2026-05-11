@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BSC Classrooms</title>
+  <link rel="icon" type="image/png" href="background.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <h1>Select a Classroom</h1>
+    <div class="button-container">
+      <a href="bsc100.html" class="bubble-button">BSC 100</a>
+      <a href="bsc101.html" class="bubble-button">BSC 101</a>
+      <a href="bsc200-201.html" class="bubble-button">BSC 200-201</a>
+      <a href="bsc202.html" class="bubble-button">BSC 202</a>
+      <a href="bsc203.html" class="bubble-button">BSC 203</a>
+      <a href="bsc204.html" class="bubble-button">BSC 204</a>
+      <a href="bsc205.html" class="bubble-button">BSC 205</a>
+      <a href="bsc206.html" class="bubble-button">BSC 206</a>
+    </div>
+    <br>
+    <a href="index.html" class="bubble-button back-button">← Back to Departments</a>
+  </div>
+
+<!-- LOGS CLICKS -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.bubble-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const page = "BCS Classrooms";
+      const action = "button_click";
+      const timestamp = new Date().toISOString();
+      const details = `Clicked button: ${button.textContent.trim()} (${button.href || 'no href'})`;
+
+      fetch("http://localhost:3000/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page, action, timestamp, details }),
+      });
+    });
+  });
+});
+</script>
+</script>
+  </script>
+</body>
+</html>

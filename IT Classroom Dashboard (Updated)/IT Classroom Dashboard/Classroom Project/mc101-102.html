@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MC 101-102 Devices</title>
+  <link rel="icon" type="image/png" href="background.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <h1>MC 103 Devices</h1>
+    <div class="button-container">
+      <a href="http://10.30.51.10" target="_blank" class="bubble-button back-button">IPCP Not Accessible</a>
+      <a href="http://10.30.51.15" target="_blank" class="bubble-button">TLP #1</a>
+      <a href="http://10.30.51.16" target="_blank" class="bubble-button">TLP #2</a>
+      <a href="http://10.30.51.70" target="_blank" class="bubble-button">RackLink</a>
+    </div>
+    <br>
+    <div class="nav-buttons">
+      <a href="mc.html" class="bubble-button back-button">← Back to MC Classrooms</a>
+      <a href="index.html" class="bubble-button back-button">Home</a>
+      </div>
+      
+  </div>
+
+
+        <!-- LOGS CLICKS -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.bubble-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const page = "MC Devices";
+      const action = "button_click";
+      const timestamp = new Date().toISOString();
+      const details = `Clicked button: ${button.textContent.trim()} (${button.href || 'no href'})`;
+
+      fetch("http://localhost:3000/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page, action, timestamp, details }),
+      });
+    });
+  });
+});
+</script>
+
+
+
+
+</body>
+</html>

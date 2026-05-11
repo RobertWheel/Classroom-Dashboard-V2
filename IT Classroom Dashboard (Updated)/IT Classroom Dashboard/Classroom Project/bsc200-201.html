@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BSC 200-201 Devices</title>
+  <link rel="icon" type="image/png" href="background.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <h1>BSC 200-201 Devices</h1>
+    <div class="button-container">
+      <a href="http://10.30.2.10" target="_blank" class="bubble-button">IPCP</a>
+      <a href="https://10.30.2.10/web/vtlp/e519b383-b519-4f48-abf1-b16f65bd51d1/index.html#/main" target="_blank" class="bubble-button">200 TLP</a>
+      <a href="https://10.30.2.10/web/vtlp/7f70a14d-7fca-48e8-9031-51850bcbdbef/index.html#/main" target="_blank" class="bubble-button">201 TLP</a>
+      <a href="http://10.30.2.70" target="_blank" class="bubble-button">RackLink</a>
+      <a href="http://10.30.2.25" target="_blank" class="bubble-button">Decoder</a>
+      <a href="http://10.30.2.30" target="_blank" class="bubble-button">Camera</a>
+    </div>
+    <br>
+    <div class="nav-buttons">
+      <a href="bsc.html" class="bubble-button back-button">← Back to BSC Classrooms</a>
+      <a href="index.html" class="bubble-button back-button">Home</a>
+    </div>
+    
+  </div>
+
+  
+<!-- LOGS CLICKS -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.bubble-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const page = "BCS 200-201 Devices";
+      const action = "button_click";
+      const timestamp = new Date().toISOString();
+      const details = `Clicked button: ${button.textContent.trim()} (${button.href || 'no href'})`;
+
+      fetch("http://localhost:3000/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page, action, timestamp, details }),
+      });
+    });
+  });
+});
+</script>
+
+</script>
+</body>
+</html>

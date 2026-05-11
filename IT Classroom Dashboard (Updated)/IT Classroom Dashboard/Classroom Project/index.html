@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IT Classroom Dashboard</title>
+  <link rel="icon" type="image/png" href="background.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="top-nav">
+      <div class="logo-container">
+        <img src="background.png" alt="Site Logo">
+      
+    
+
+      </div>
+      
+      <a href="StatusPage.html" class="bubble-button">Status</a>
+      <a href="https://drive.google.com/drive/home?dmr=1&ec=wgc-drive-globalnav-goto" target="_blank">Google Drive</a>
+      <a href="https://themasterscollege.teamwork.com/desk/dashboard/summary" target="_blank">Team Work Desk</a>
+      <a href="https://central.masters.edu/AccountResearch/" target="_blank">TMU Central/Account Research</a>
+      <a href="https://tmu.snipe-it.io/login" target="_blank">Snipe IT</a>
+      <a href="https://outlook.office.com/bookings/homepage" target="_blank">Bookings</a> 
+      <a href="https://teams.microsoft.com/v2/" target="_blank">Teams</a> 
+       <!-- <a href="toolkit.html" class="bubble-button">Call Toolkit</a> -->
+      
+      <!-- <a href="https://www.masters.edu/current-students/information-technology/" target="_blank">Contact</a> -->
+      <!-- <a href="logs.html" class="bubble-button">Logs</a> -->
+     <!-- <button id="logoutBtn" class="bubble-button" style="float:right;">Log Out</button> -->
+    </div>
+
+    <h1>Select a Department</h1>
+    
+    <div class="button-container">
+      <a href="bsc.html" class="bubble-button">BSC</a>
+      <a href="bus.html" class="bubble-button">BUS</a>
+      <a href="ehc.html" class="bubble-button">EHC</a>
+      <a href="ecs.html" class="bubble-button">ECS</a>
+      <a href="mc.html" class="bubble-button">MC</a>
+      <a href="rcsm.html" class="bubble-button">RCSM</a>
+      <a href="cc1-lab.html" class="bubble-button">CC1/Lab</a>
+      <a href="kin.html" class="bubble-button">KIN</a>
+      <a href="SPMT.html" class="bubble-button">SPMT</a>
+      <a href="ENTREP.html" class="bubble-button">ENT</a>
+    </div>
+
+    <h2>Room Status</h2>
+    <button id="refresh-button" class="bubble-button">Refresh Room Status</button>
+    <div id="room-status"></div>
+    
+  </div>
+
+ <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    /*
+    // ======== AUTH CHECK (DISABLED FOR NOW) ========
+    if (localStorage.getItem('authenticated') !== 'true') {
+      window.location.href = 'PSK.html';
+      return; // prevent further code from running
+    }
+    */
+
+    // Logout button handler
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        /*
+        localStorage.removeItem('authenticated');
+        window.location.href = 'PSK.html';
+        */
+        alert("Logout disabled in this version.");
+      });
+    }
+
+    const container = document.getElementById("room-status");
+
+    async function checkRoomsStatus(showChecking = false) {
+      try {
+        if (showChecking) {
+          const statusDivs = container.querySelectorAll(".status");
+          statusDivs.forEach(div => {
+            const roomName = div.id.replace("status-", "").replace(/-/g, " ");
+            div.className = "status checking";
+            div.textContent = `Checking ${roomName}...`;
+          });
+        }
+
+        const response = await fetch("http://localhost:3000/api/status");
+        const data = await response.json();
+
+        if (container.childElementCount === 0) {
+          const grouped = {};
+          data.forEach(room => {
+            const building = room.name.split(" ")[0];
+            if (!grouped[building]) grouped[building] = [];
+            grouped[building].push(room);
+          });
+
+          for (const building in grouped) {
+            const column = document.createElement("div");
+            column.className = "room-column";
+
+            const header = document.createElement("h3");
+            header.textContent = building;
+            column.appendChild(header);
+
+            grouped[building].forEach(room => {
+              const statusDiv = document.createElement("div");
+              statusDiv.className = "status";
+              statusDiv.id = `status-${room.name.replace(/\s+/g, "-")}`;
+              column.appendChild(statusDiv);
+            });
+
+            container.appendChild(column);
+          }
+        }
+
+        data.forEach(room => {
+          const statusDiv = document.getElementById(`status-${room.name.replace(/\s+/g, "-")}`);
+          if (!statusDiv) return;
+
+          statusDiv.classList.remove("online", "offline", "warning", "checking");
+
+          const allOnline = room.status.every(d => d.alive);
+          const allOffline = room.status.every(d => !d.alive);
+
+          if (allOnline) {
+            statusDiv.textContent = `🟢 ${room.name}`;
+            statusDiv.classList.add("online");
+          } else if (allOffline) {
+            statusDiv.textContent = `🔴 ${room.name} (Room Offline)`;
+            statusDiv.classList.add("offline");
+          } else {
+            const offlineDevices = room.status.filter(d => !d.alive).map(d => d.type).join(", ");
+            statusDiv.textContent = `🟡 ${room.name} (${offlineDevices} offline)`;
+            statusDiv.classList.add("warning");
+          }
+        });
+
+      } catch (error) {
+        container.innerHTML = "Error fetching room status. Is the server running?";
+        console.error("Fetch error:", error);
+      }
+    }
+
+    checkRoomsStatus(false);
+    setInterval(() => checkRoomsStatus(false), 10000);
+    document.getElementById("refresh-button").addEventListener("click", () => checkRoomsStatus(true));
+  });
+
+   //LOGS CLICKS
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.bubble-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const page = "Home Page";
+      const action = "button_click";
+      const timestamp = new Date().toISOString();
+      const details = `Clicked button: ${button.textContent.trim()} (${button.href || 'no href'})`;
+
+      fetch("http://localhost:3000/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page, action, timestamp, details }),
+      });
+    });
+  });
+});
+
+
+
+</script>
+<br>
+<br>
+<br>
+</body>
+</html>
