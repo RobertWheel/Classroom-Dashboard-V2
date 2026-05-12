@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PSK Authentication</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      max-width: 400px;
+      margin: auto;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .error {
+      color: red;
+      margin-top: 0.5rem;
+      height: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h2>Enter Your Access Key</h2>
+  <input type="password" id="pskInput" placeholder="Enter PSK" autofocus />
+  <button id="submitBtn">Submit</button>
+  <div class="error" id="errorMsg"></div>
+
+  <script>
+    async function authenticate() {
+      const psk = document.getElementById('pskInput').value.trim();
+      const errorDiv = document.getElementById('errorMsg');
+      errorDiv.textContent = '';
+
+      if (!psk) {
+        errorDiv.textContent = 'Please enter the PSK.';
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/api/authenticate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ psk })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          window.location.href = 'index.html'; 
+        } else {
+          errorDiv.textContent = data.message || 'Authentication failed';
+        }
+      } catch (err) {
+        errorDiv.textContent = 'Network or server error';
+      }
+    }
+
+    document.getElementById('submitBtn').addEventListener('click', authenticate);
+    document.getElementById('pskInput').addEventListener('keypress', e => {
+      if (e.key === 'Enter') authenticate();
+    });
+  </script>
+</body>
+</html>

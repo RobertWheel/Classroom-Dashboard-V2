@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ITO Devices</title>
+  <link rel="icon" type="image/png" href="background.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <h1>ITO Devices</h1>
+    <div class="button-container">
+        <a href="https://10.30.255.10" target="_blank" class="bubble-button">IPCP</a>
+        <a href="https://10.30.255.10/web/vtlp/bd1cd33d-e794-4707-8b67-3251cdb11f76/index.html#!/main" target="_blank" class="bubble-button">TLP</a>
+        <a href="https://pulse.neat.no/KN9VQZv/p/remotecontrol/9d28981f-98e7-464a-a7e0-47c2e8ae1b77" target="_blank" class="bubble-button">Schedule Neat Pad</a>
+        <a href="https://pulse.neat.no/KN9VQZv/p/remotecontrol/413c70f2-73ea-43cf-bdf2-74b5a7e7e124,89ee8f9f-c5c7-4827-874d-063ee5c0537f" target="_blank" class="bubble-button">Conference Room Neat Pad</a>
+    </div>
+    <br>
+    <div class="nav-buttons">
+      <a href="index.html" class="bubble-button back-button">Home</a>
+      </div>
+      
+  </div>
+
+          <!-- LOGS CLICKS -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.bubble-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const page = "KIN 2 Devices";
+      const action = "button_click";
+      const timestamp = new Date().toISOString();
+      const details = `Clicked button: ${button.textContent.trim()} (${button.href || 'no href'})`;
+
+      fetch("http://localhost:3000/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page, action, timestamp, details }),
+      });
+    });
+  });
+});
+</script>
+
+
+
+</body>
+</html>

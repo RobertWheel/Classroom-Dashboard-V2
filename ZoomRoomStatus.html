@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IT Classroom Dashboard</title>
+  <link rel="icon" type="image/png" href="background.png">
+
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .attention-box {
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+      padding: 15px 20px;
+      margin: 20px auto;
+      border-radius: 10px;
+      max-width: 800px;
+      font-size: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .attention-box h3 {
+      margin-top: 0;
+    }
+    .attention-item {
+      margin: 8px 0;
+    }
+
+
+
+
+        #zoom-status {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 10px;
+      margin-bottom: 30px;
+    }
+    .zoom-room {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      min-width: 180px;
+    }
+    .zoom-room.available { background: #d4edda; color: #155724; }
+    .zoom-room.offline   { background: #f8d7da; color: #721c24; }
+    .zoom-error          { color: #721c24; font-style: italic; }
+
+
+
+
+
+
+
+
+
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="top-nav">
+      <div class="logo-container">
+        <img src="background.png" alt="Site Logo">
+      </div>
+      <a href="index.html" class="bubble-button">Home</a>
+      <a href="StatusPage.html" class="bubble-button">Classroom Status</a>
+      <a href="https://drive.google.com/drive/home?dmr=1&ec=wgc-drive-globalnav-goto" target="_blank">Google Drive</a>
+      <a href="https://themasterscollege.teamwork.com/desk/dashboard/summary" target="_blank">Team Work Desk</a>
+      <a href="https://central.masters.edu/" target="_blank">TMU Central/Account Research</a>
+      <a href="https://tmu.snipe-it.io/login" target="_blank">Snipe IT</a>
+      <a href="https://outlook.office.com/bookings/homepage" target="_blank">Bookings</a> 
+      <!-- <a href="https://www.masters.edu/current-students/information-technology/" target="_blank">Contact</a> -->
+      <!-- <a href="logs.html" class="bubble-button">Logs</a> -->
+     <!-- <button id="logoutBtn" class="bubble-button" style="float:right;">Log Out</button> -->
+    </div>
+
+    <div id="attention-box" class="attention-box" style="display: none;">
+      <h3>⚠️ Needs Attention</h3>
+      <div id="attention-items"></div>
+    </div>
+
+    <h2>Zoom Room Status</h2>
+    <button id="zoom-refresh-button" class="bubble-button" style="margin-bottom: 20px;">Refresh Zoom Status</button>
+    <div id="zoom-status"><em>Loading Zoom Rooms...</em></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const zoomContainer = document.getElementById("zoom-status");
+
+  async function checkZoomStatus() {
+    try {
+      const response = await fetch("http://localhost:3000/api/zoom-status");
+      const data = await response.json();
+
+      if (data.error) {
+        zoomContainer.innerHTML = `<span class="zoom-error">⚠️ ${data.error}: ${data.detail}</span>`;
+        return;
+      }
+
+      if (data.length === 0) {
+        zoomContainer.innerHTML = "<em>No Zoom Rooms found.</em>";
+        return;
+      }
+
+      zoomContainer.innerHTML = "";
+      data.forEach(room => {
+        const div = document.createElement("div");
+        const online = room.status !== "Offline";
+        div.className = `zoom-room ${online ? "available" : "offline"}`;
+        div.textContent = `${online ? "🟢" : "🔴"} ${room.name}`;
+        zoomContainer.appendChild(div);
+      });
+
+    } catch (error) {
+      zoomContainer.innerHTML = `<span class="zoom-error">Error fetching Zoom status. Is the server running?</span>`;
+      console.error("Zoom fetch error:", error);
+    }
+  }
+
+  checkZoomStatus();
+  setInterval(checkZoomStatus, 30000);
+  document.getElementById("zoom-refresh-button").addEventListener("click", checkZoomStatus);
+});
+</script>
+
+
+
+</body>
+</html>
+<br>
+<br>
+<br>

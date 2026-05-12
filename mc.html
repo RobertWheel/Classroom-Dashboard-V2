@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MC Classrooms</title>
+  <link rel="icon" type="image/png" href="background.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="page-wrapper">
+  <h1>Select a Classroom</h1>
+  <div class="button-container">
+    <a href="mc103.html" class="bubble-button">MC 103</a>
+    <a href="mc104.html" class="bubble-button">MC 104</a>
+    <a href="mc101-102.html" class="bubble-button">MC 101/102</a>
+  </div>
+  <br>
+  <a href="index.html" class="bubble-button back-button">← Back to Departments</a>
+</div>
+
+
+      <!-- LOGS CLICKS -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.bubble-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const page = "MC Classrooms";
+      const action = "button_click";
+      const timestamp = new Date().toISOString();
+      const details = `Clicked button: ${button.textContent.trim()} (${button.href || 'no href'})`;
+
+      fetch("http://localhost:3000/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page, action, timestamp, details }),
+      });
+    });
+  });
+});
+</script>
+
+
+
+</body>
+</html>

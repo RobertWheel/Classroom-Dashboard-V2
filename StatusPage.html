@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IT Classroom Dashboard</title>
+  <link rel="icon" type="image/png" href="background.png">
+
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .attention-box {
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+      padding: 15px 20px;
+      margin: 20px auto;
+      border-radius: 10px;
+      max-width: 800px;
+      font-size: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .attention-box h3 {
+      margin-top: 0;
+    }
+    .attention-item {
+      margin: 8px 0;
+    }
+
+
+
+
+        #zoom-status {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 10px;
+      margin-bottom: 30px;
+    }
+    .zoom-room {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      min-width: 180px;
+    }
+    .zoom-room.available { background: #d4edda; color: #155724; }
+    .zoom-room.offline   { background: #f8d7da; color: #721c24; }
+    .zoom-error          { color: #721c24; font-style: italic; }
+
+
+
+
+
+
+
+
+
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="top-nav">
+      <div class="logo-container">
+        <img src="background.png" alt="Site Logo">
+      </div>
+      <a href="index.html" class="bubble-button">Home</a>
+      <a href="ZoomRoomStatus.html" class="bubble-button">Zoom Room Status</a>
+      <a href="https://drive.google.com/drive/home?dmr=1&ec=wgc-drive-globalnav-goto" target="_blank">Google Drive</a>
+      <a href="https://themasterscollege.teamwork.com/desk/dashboard/summary" target="_blank">Team Work Desk</a>
+      <a href="https://central.masters.edu/" target="_blank">TMU Central/Account Research</a>
+      <a href="https://tmu.snipe-it.io/login" target="_blank">Snipe IT</a>
+      <a href="https://outlook.office.com/bookings/homepage" target="_blank">Bookings</a> 
+      <!-- <a href="https://www.masters.edu/current-students/information-technology/" target="_blank">Contact</a> -->
+      <!-- <a href="logs.html" class="bubble-button">Logs</a> -->
+     <!-- <button id="logoutBtn" class="bubble-button" style="float:right;">Log Out</button> -->
+    </div>
+
+    <div id="attention-box" class="attention-box" style="display: none;">
+      <h3>⚠️ Needs Attention</h3>
+      <div id="attention-items"></div>
+    </div>
+
+    <h2>Room Status</h2>
+    <button id="refresh-button" class="bubble-button" style="margin-bottom: 20px;">Refresh Room Status</button>
+    <div id="room-status"></div>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const container = document.getElementById("room-status");
+  const attentionBox = document.getElementById("attention-box");
+  const attentionItems = document.getElementById("attention-items");
+
+  async function checkRoomsStatus(showChecking = false) {
+    try {
+      if (showChecking) {
+        const statusDivs = container.querySelectorAll(".status");
+        statusDivs.forEach(div => {
+          const roomName = div.id.replace("status-", "").replace(/-/g, " ");
+          div.className = "status checking";
+          div.textContent = `Checking ${roomName}...`;
+        });
+      }
+
+      const response = await fetch("http://localhost:3000/api/status");
+      const data = await response.json();
+
+      const attentionList = [];
+
+      if (container.childElementCount === 0) {
+        const grouped = {};
+        data.forEach(room => {
+          const building = room.name.split(" ")[0];
+          if (!grouped[building]) grouped[building] = [];
+          grouped[building].push(room);
+        });
+
+        for (const building in grouped) {
+          const column = document.createElement("div");
+          column.className = "room-column";
+
+          const header = document.createElement("h3");
+          header.textContent = building;
+          column.appendChild(header);
+
+          grouped[building].forEach(room => {
+            const statusDiv = document.createElement("div");
+            statusDiv.className = "status";
+            statusDiv.id = `status-${room.name.replace(/\s+/g, "-")}`;
+            column.appendChild(statusDiv);
+          });
+
+          container.appendChild(column);
+        }
+      }
+
+      data.forEach(room => {
+        const statusDiv = document.getElementById(`status-${room.name.replace(/\s+/g, "-")}`);
+        if (!statusDiv) return;
+
+        statusDiv.classList.remove("online", "offline", "warning", "checking");
+
+        const allOnline = room.status.every(d => d.alive);
+        const allOffline = room.status.every(d => !d.alive);
+
+        if (allOnline) {
+          statusDiv.textContent = `🟢 ${room.name}`;
+          statusDiv.classList.add("online");
+        } else if (allOffline) {
+          statusDiv.textContent = `🔴 ${room.name} (Room Offline)`;
+          statusDiv.classList.add("offline");
+          attentionList.push(`<div class="attention-item">${room.name}: Entire room offline</div>`);
+        } else {
+          const offlineDevices = room.status.filter(d => !d.alive).map(d => d.type).join(", ");
+          statusDiv.textContent = `🟡 ${room.name} (${offlineDevices} offline)`;
+          statusDiv.classList.add("warning");
+          attentionList.push(`<div class="attention-item">${room.name}: ${offlineDevices} offline</div>`);
+        }
+      });
+
+      if (attentionList.length > 0) {
+        attentionItems.innerHTML = attentionList.join("");
+        attentionBox.style.display = "block";
+      } else {
+        attentionItems.innerHTML = "";
+        attentionBox.style.display = "none";
+      }
+
+    } catch (error) {
+      container.innerHTML = "Error fetching room status. Is the server running?";
+      console.error("Fetch error:", error);
+    }
+  }
+
+  checkRoomsStatus(false);
+  setInterval(() => checkRoomsStatus(false), 10000);
+  document.getElementById("refresh-button").addEventListener("click", () => checkRoomsStatus(true));
+});
+</script>
+
+          <!-- LOGS CLICKS -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.bubble-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const page = "Status Page";
+      const action = "button_click";
+      const timestamp = new Date().toISOString();
+      const details = `Clicked button: ${button.textContent.trim()} (${button.href || 'no href'})`;
+
+      fetch("http://localhost:3000/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page, action, timestamp, details }),
+      });
+    });
+  });
+});
+</script>
+
+
+
+</body>
+</html>
+<br>
+<br>
+<br>

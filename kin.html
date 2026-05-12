@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>KIN Classrooms</title>
+  <link rel="icon" type="image/png" href="background.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="page-wrapper">
+  <h1>Select a Classroom</h1>
+  <div class="button-container">
+    <a href="kin1.html" class="bubble-button">KIN 1</a>
+    <a href="kin2.html" class="bubble-button">KIN 2</a>
+  </div>
+  <br>
+  <a href="index.html" class="bubble-button back-button">← Back to Departments</a>
+</div>
+
+      <!-- LOGS CLICKS -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.bubble-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const page = "KIN Classrooms";
+      const action = "button_click";
+      const timestamp = new Date().toISOString();
+      const details = `Clicked button: ${button.textContent.trim()} (${button.href || 'no href'})`;
+
+      fetch("http://localhost:3000/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page, action, timestamp, details }),
+      });
+    });
+  });
+});
+</script>
+
+
+</body>
+</html>

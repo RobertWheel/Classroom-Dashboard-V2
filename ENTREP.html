@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ENT 101 Devices</title>
+  <link rel="icon" type="image/png" href="background.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <h1>ENT 101 Devices</h1>
+    <div class="button-container">
+      <a href="https://10.30.111.10/web/vtlp/ce101cb0-dddd-4268-bbc6-6ab45e5566a3/index.html#!/main" target="_blank" class="bubble-button">MLC 400</a>
+      <a href="https://pulse.neat.no/KN9VQZv/p/remotecontrol/3a522d13-6461-4425-8855-e12ed3b7a470" target="_blank" class="bubble-button">Zoom Room Controller</a>
+      
+    </div>
+    <br>
+    <div class="nav-buttons">
+      <a href="index.html" class="bubble-button back-button">Home</a>
+    </div>
+  </div>
+
+    <!-- LOGS CLICKS -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.bubble-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const page = "ENT 101 Devices";
+      const action = "button_click";
+      const timestamp = new Date().toISOString();
+      const details = `Clicked button: ${button.textContent.trim()} (${button.href || 'no href'})`;
+
+      fetch("http://localhost:3000/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page, action, timestamp, details }),
+      });
+    });
+  });
+});
+</script>
+
+</body>
+</html>

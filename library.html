@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Library Neat Pads</title>
+  <link rel="icon" type="image/png" href="background.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <h1>Library Neat Pads</h1>
+    <div class="button-container">
+    <a href="https://pulse.neat.no/KN9VQZv/p/remotecontrol/0c08de58-6624-4dfe-8f3d-a3758bfecd61" target="_blank" class="bubble-button">Study Room A Neat</a>
+    <a href="https://pulse.neat.no/KN9VQZv/p/remotecontrol/4c484afe-dd07-4e58-9ff2-a06700dbc2b2" target="_blank" class="bubble-button">Study Room B Neat</a>
+    <a href="https://pulse.neat.no/KN9VQZv/p/remotecontrol/e5ba1fbb-1e4c-433e-b833-2928ed2e5ec0" target="_blank" class="bubble-button">Study Room C Neat</a>
+    
+    </div>
+    <br>
+    <div class="nav-buttons">
+      <a href="index.html" class="bubble-button back-button">Home</a>
+      </div>
+      
+  </div>
+
+          <!-- LOGS CLICKS -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.bubble-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const page = "KIN 2 Devices";
+      const action = "button_click";
+      const timestamp = new Date().toISOString();
+      const details = `Clicked button: ${button.textContent.trim()} (${button.href || 'no href'})`;
+
+      fetch("http://localhost:3000/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page, action, timestamp, details }),
+      });
+    });
+  });
+});
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Log Viewer</title>
+  <link rel="icon" type="image/png" href="background.png">
+  <link rel="stylesheet" href="style.css">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f8f9fa;
+    margin: 0;
+    padding: 0;
+  }
+  .page-wrapper {
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+  }
+  table {
+    width: 100%;
+    min-width: 700px; /* slightly narrower */
+    border-collapse: separate;
+    border-spacing: 0 6px;
+    background: white;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+    font-size: 12px; /* smaller font size */
+  }
+  th, td {
+    padding: 8px 6px; /* tighter padding */
+    border-bottom: none;
+    text-align: left;
+    vertical-align: middle;
+  }
+  th {
+    background: #343a40;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    font-size: 13px; /* slightly bigger header font */
+  }
+  tbody tr {
+    background: white;
+    box-shadow: 0 2px 5px rgb(0 0 0 / 0.05);
+    border-radius: 6px;
+  }
+  tbody tr:hover {
+    background: #f1f1f1;
+  }
+  .ip {
+    font-family: monospace;
+  }
+</style>
+
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="top-nav">
+      <div class="logo-container">
+        <img src="background.png" alt="Site Logo">
+      </div>
+      <a href="index.html" class="bubble-button">Home</a>
+      <a href="StatusPage.html" class="bubble-button">Status</a>
+      <a href="https://drive.google.com/drive/home?dmr=1&ec=wgc-drive-globalnav-goto" target="_blank">Google Drive</a>
+      <a href="https://themasterscollege.teamwork.com/desk/dashboard/summary" target="_blank">Team Work Desk</a>
+      <a href="https://www.masters.edu/current-students/information-technology/" target="_blank">Contact</a>
+    </div>
+
+    <h1>Access Logs</h1>
+    <div class="table-container">
+      <table id="logTable">
+        <thead>
+          <tr>
+            <th>ID</th>              
+            <th>IP</th>
+            <th>Page</th>
+            <th>Action</th>
+            <th>Timestamp</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="6">Loading...</td></tr>  
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    fetch('http://localhost:3000/api/logs')
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.querySelector('#logTable tbody');
+        tbody.innerHTML = '';
+        data.forEach(log => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${log.id}</td>                 <!-- ID added -->
+            <td class="ip">${log.ip}</td>
+            <td>${log.page}</td>
+            <td>${log.action}</td>
+            <td>${log.timestamp}</td>
+            <td>${log.details || ''}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      })
+      .catch(err => {
+        document.querySelector('#logTable tbody').innerHTML = '<tr><td colspan="6">Error loading logs</td></tr>';
+      });
+
+
+//LOGS CLICKS -->
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.bubble-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const page = "Log Page";
+      const action = "button_click";
+      const timestamp = new Date().toISOString();
+      const details = `Clicked button: ${button.textContent.trim()} (${button.href || 'no href'})`;
+
+      fetch("http://localhost:3000/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page, action, timestamp, details }),
+      });
+    });
+  });
+});
+</script>
+
+
+  </script>
+</body>
+</html>

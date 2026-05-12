@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CC1/Lab Devices</title>
+  <link rel="icon" type="image/png" href="background.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <h1>CC1/Lab Devices</h1>
+    <div class="button-container">
+      <a href="http://10.30.26.10" target="_blank" class="bubble-button">IPCP</a>
+      <a href="https://10.30.26.10/web/vtlp/bhcc1/index.html#/main" target="_blank" class="bubble-button">CC1 TLP</a>
+      <a href="https://10.30.26.10/web/vtlp/c86a53b9-6a3b-45c3-be7b-8ed15147b22a/index.html#/main" target="_blank" class="bubble-button">LAB TLP</a>
+      <a href="http://10.30.26.70" target="_blank" class="bubble-button">CC1 RackLink</a>
+      <a href="http://10.30.26.71" target="_blank" class="bubble-button">LAB RackLink</a>
+      <a href="http://10.30.26.72" target="_blank" class="bubble-button">Classroom Desk RackLink</a>
+    </div>
+    <br>
+    <div class="nav-buttons">
+      <a href="index.html" class="bubble-button back-button">← Back to Departments</a>
+    </div>
+    
+  </div>
+
+    <!-- LOGS CLICKS -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.bubble-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const page = "CC-1 Devices";
+      const action = "button_click";
+      const timestamp = new Date().toISOString();
+      const details = `Clicked button: ${button.textContent.trim()} (${button.href || 'no href'})`;
+
+      fetch("http://localhost:3000/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page, action, timestamp, details }),
+      });
+    });
+  });
+});
+</script>
+
+
+</body>
+</html>
